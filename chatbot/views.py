@@ -1,9 +1,8 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from groq import Groq
 import os
-
-client = Groq(api_key=os.getenv("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"))
+from groq import Groq
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def chat(request):
     return render(request, "chat.html")
