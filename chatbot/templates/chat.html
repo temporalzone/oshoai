@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 
@@ -259,17 +260,15 @@ opacity:.6;
 
 <body>
     <div id="particles-js"></div>
-    <audio id="meditationSound" autoplay loop>
-
-<source src="/static/meditation.mp3" type="audio/mpeg">
-
+    <audio autoplay loop>
+<source src="{% static 'meditation.mp3' %}" type="audio/mpeg">
 </audio>
 
     <div id="splash">
 
 <div class="osho-aura">
 
-<img src="/static/osho.jpg">
+<img src="{% static 'osho.jpg' %}">
 
 </div>
 
