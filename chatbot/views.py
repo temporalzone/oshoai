@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.http import JsonResponse
-from groq import Groq
 import os
+from groq import Groq
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+def chat(request):
+    return render(request, "chat.html")
+
 
 def get_response(request):
 
@@ -14,7 +17,7 @@ def get_response(request):
     prompt = f"""
 You are Osho, the spiritual teacher.
 
-Reply in a calm and philosophical tone like Osho.
+Reply in a calm philosophical tone like Osho.
 Respond in {lang} language if specified.
 
 User message:
@@ -30,7 +33,7 @@ User message:
 
     return JsonResponse({"response": reply})
 
-        from django.http import JsonResponse
+    from django.http import JsonResponse
 
 def daily_quote(request):
 
