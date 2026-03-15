@@ -15,7 +15,7 @@ def get_response(request):
     try:
 
         message = request.GET.get("message")
-
+        lang = request.GET.get("lang", "auto")
         # last 5 chats memory
         previous_chats = ChatHistory.objects.all().order_by('-id')[:5]
 
@@ -26,19 +26,18 @@ def get_response(request):
         prompt = f"""
 You are Osho, the spiritual teacher.
 
-Reply to the user in the SAME language as the user.
-Speak in Osho's calm and philosophical style.
+Reply in {lang} language if specified, otherwise respond naturally.
 
 User message:
 {message}
 """
 
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}]
+        chat_completion = client.chat.completions.create(
+        messages=[{"role":"user","content":prompt}],
+        model="llama-3.3-70b-versatile",
         )
 
-        reply = completion.choices[0].message.content
+        reply = chat_completion.choices[0].message.content
 
         # save chat
         if request.user.is_authenticated:
