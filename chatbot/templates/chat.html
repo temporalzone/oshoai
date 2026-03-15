@@ -297,7 +297,17 @@ opacity:.6;
 Osho AI Chatbot
 </div>
 <div id="quoteBox" style="text-align:center;padding:10px;font-style:italic;color:#cbd5f5;"></div>
+<div id="meditationBox" style="text-align:center;padding:15px">
 
+<h3>🧘 Meditation Timer</h3>
+
+<button onclick="startMeditation(5)">5 min</button>
+<button onclick="startMeditation(10)">10 min</button>
+<button onclick="startMeditation(15)">15 min</button>
+
+<p id="timerText"></p>
+
+</div>
 
 <div class="chat-container" id="chatbox"></div>
 
@@ -376,7 +386,8 @@ fetch("/get/?message="+encodeURIComponent(message))
 
 document.querySelector(".typing").parentElement.innerHTML=
 marked.parse(data.response)+
-`<span class="copy" onclick="copyText(this)">📋</span>`
+`<span class="copy" onclick="copyText(this)">📋</span>
+<span class="copy" onclick="saveFav(this)">⭐</span>`
 
 chatbox.scrollTop=chatbox.scrollHeight
 
@@ -511,6 +522,65 @@ fetch("/quote/")
 .then(data=>{
 document.getElementById("quoteBox").innerText="🧘 "+data.quote
 })
+
+function saveFav(el){
+
+let text = el.parentElement.innerText
+
+let favs = JSON.parse(localStorage.getItem("oshoFav")) || []
+
+favs.push(text)
+
+localStorage.setItem("oshoFav", JSON.stringify(favs))
+
+el.innerText="✅"
+
+}
+
+function saveFav(el){
+
+let text = el.parentElement.innerText
+
+let favs = JSON.parse(localStorage.getItem("oshoFav")) || []
+
+favs.push(text)
+
+localStorage.setItem("oshoFav", JSON.stringify(favs))
+
+el.innerText="✅"
+
+}
+
+function startMeditation(minutes){
+
+let total = minutes*60
+
+let timer = setInterval(()=>{
+
+let min = Math.floor(total/60)
+let sec = total%60
+
+document.getElementById("timerText").innerText =
+"⏳ "+min+":"+sec
+
+total--
+
+if(total<0){
+
+clearInterval(timer)
+
+document.getElementById("timerText").innerText =
+"✨ Meditation Complete"
+
+let bell = new Audio("{% static 'meditation.mp3' %}")
+
+bell.play()
+
+}
+
+},1000)
+
+}
 </script>
 
 </body>
