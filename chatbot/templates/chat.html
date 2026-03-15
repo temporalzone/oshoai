@@ -378,7 +378,9 @@ chatbox.innerHTML+=typing
 
 chatbox.scrollTop=chatbox.scrollHeight
 
-fetch("/get/?message="+encodeURIComponent(message))
+let lang=document.getElementById("language").value
+
+fetch(`/get/?message=${encodeURIComponent(message)}&lang=${lang}`)
 
 .then(response=>response.json())
 
@@ -572,9 +574,9 @@ clearInterval(timer)
 document.getElementById("timerText").innerText =
 "✨ Meditation Complete"
 
-let bell = new Audio("{% static 'meditation.mp3' %}")
-
-bell.play()
+let sound=document.getElementById("meditationSound")
+sound.currentTime=0
+sound.play()
 
 }
 
