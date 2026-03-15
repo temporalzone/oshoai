@@ -52,3 +52,18 @@ User message:
 
     except Exception as e:
         return JsonResponse({"response": str(e)})
+
+        from django.http import JsonResponse
+
+def daily_quote(request):
+
+    prompt = "Give one short inspirational quote in the style of Osho."
+
+    chat_completion = client.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model="llama-3.3-70b-versatile",
+    )
+
+    quote = chat_completion.choices[0].message.content
+
+    return JsonResponse({"quote": quote})

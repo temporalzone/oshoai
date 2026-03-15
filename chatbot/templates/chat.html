@@ -296,6 +296,8 @@ opacity:.6;
 <div class="header">
 Osho AI Chatbot
 </div>
+<div id="quoteBox" style="text-align:center;padding:10px;font-style:italic;color:#cbd5f5;"></div>
+
 
 <div class="chat-container" id="chatbox"></div>
 
@@ -504,6 +506,11 @@ document.addEventListener("click", function () {
     }
 });
 
+fetch("/quote/")
+.then(res=>res.json())
+.then(data=>{
+document.getElementById("quoteBox").innerText="🧘 "+data.quote
+})
 </script>
 
 </body>
