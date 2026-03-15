@@ -379,6 +379,8 @@ marked.parse(data.response)+
 
 chatbox.scrollTop=chatbox.scrollHeight
 
+speak(data.response)
+
 })
 
 }
@@ -401,6 +403,29 @@ document.getElementById("message")
 if(e.key==="Enter") sendMessage()
 
 })
+
+function speak(text){
+
+let speech = new SpeechSynthesisUtterance(text)
+
+speech.lang = "en-US"
+
+let voices = window.speechSynthesis.getVoices()
+
+let voice = voices.find(v =>
+v.name.toLowerCase().includes("male") ||
+v.name.toLowerCase().includes("david") ||
+v.name.toLowerCase().includes("daniel")
+)
+
+speech.voice = voice || voices[0]
+
+speech.rate = 0.85
+speech.pitch = 0.8
+
+window.speechSynthesis.speak(speech)
+
+}
 
 function startVoice(){
 
