@@ -10,13 +10,12 @@ def chat(request):
 
 
 def get_response(request):
+    try:
+        message = request.GET.get("message")
+        lang = request.GET.get("lang", "auto")
 
-    message = request.GET.get("message")
-    lang = request.GET.get("lang", "auto")
-
-    prompt = f"""
+        prompt = f"""
 You are Osho, the spiritual teacher.
-
 Reply in a calm philosophical tone like Osho.
 Respond in {lang} language if specified.
 
@@ -24,25 +23,31 @@ User message:
 {message}
 """
 
-    chat_completion = client.chat.completions.create(
-        messages=[{"role": "user", "content": prompt}],
-        model="llama-3.3-70b-versatile",
-    )
+        chat_completion = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model="llama-3.3-70b-versatile",
+        )
 
-    reply = chat_completion.choices[0].message.content
+        reply = chat_completion.choices[0].message.content
 
-    return JsonResponse({"response": reply})
+        return JsonResponse({"response": reply})
+
+    except Exception as e:
+        return JsonResponse({"response": str(e)})
 
 
 def daily_quote(request):
+    try:
+        prompt = "Give one short inspirational quote in the style of Osho."
 
-    prompt = "Give one short inspirational quote in the style of Osho."
+        chat_completion = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model="llama-3.3-70b-versatile",
+        )
 
-    chat_completion = client.chat.completions.create(
-        messages=[{"role": "user", "content": prompt}],
-        model="llama-3.3-70b-versatile",
-    )
+        quote = chat_completion.choices[0].message.content
 
-    quote = chat_completion.choices[0].message.content
+        return JsonResponse({"quote": quote})
 
-    return JsonResponse({"quote": quote})
+    except Exception as e:
+        return JsonResponse({"quote": str(e)})
