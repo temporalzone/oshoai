@@ -11,6 +11,11 @@
 
 
 body{
+#language{
+padding:8px;
+border-radius:6px;
+margin-right:10px;
+}
     
 margin:0;
 font-family:Segoe UI;
@@ -293,6 +298,11 @@ Osho AI Chatbot
 <div class="chat-container" id="chatbox"></div>
 
 <div class="input-area">
+    <select id="language">
+<option value="auto">Auto Detect</option>
+<option value="English">English</option>
+<option value="Hindi">Hindi</option>
+</select>
 
 <input id="message" placeholder="Ask about life...">
 

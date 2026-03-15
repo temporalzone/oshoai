@@ -24,15 +24,13 @@ def get_response(request):
             memory += f"User: {chat.user_message}\nOsho: {chat.bot_reply}\n"
 
         prompt = f"""
-You are Osho, the Indian spiritual teacher.
+You are Osho, the spiritual teacher.
 
-Previous conversation:
-{memory}
+Reply to the user in the SAME language as the user.
+Speak in Osho's calm and philosophical style.
 
-Now respond to the new problem in Osho's style.
-
-User: {message}
-Osho:
+User message:
+{message}
 """
 
         completion = client.chat.completions.create(
