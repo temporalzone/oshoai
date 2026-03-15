@@ -33,7 +33,6 @@ User message:
 
     return JsonResponse({"response": reply})
 
-    from django.http import JsonResponse
 
 def daily_quote(request):
 
