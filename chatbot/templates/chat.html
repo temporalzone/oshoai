@@ -58,6 +58,46 @@ margin-bottom:10px;
 cursor:pointer;
 }
 
+.sidebar-section-title{
+font-size:13px;
+color:#93c5fd;
+margin:16px 0 8px;
+letter-spacing:.3px;
+}
+
+.fav-item{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:8px;
+padding:8px;
+border:1px solid #1e293b;
+border-radius:8px;
+margin-bottom:8px;
+background:#0b1328;
+}
+
+.fav-text{
+font-size:13px;
+color:#dbeafe;
+line-height:1.4;
+word-break:break-word;
+}
+
+.fav-remove{
+background:transparent;
+border:none;
+color:#fca5a5;
+padding:0;
+font-size:14px;
+cursor:pointer;
+}
+
+.fav-empty{
+font-size:12px;
+color:#94a3b8;
+}
+
 /* Main */
 
 .main{
@@ -287,7 +327,11 @@ opacity:.6;
 
 <h2>🧘 Osho Chats</h2>
 
+<div class="sidebar-section-title">Recent Chats</div>
 <div id="history"></div>
+
+<div class="sidebar-section-title">Favorites</div>
+<div id="favorites"></div>
 
 </div>
 
@@ -331,6 +375,52 @@ Osho AI Chatbot
 <script>
 
 let historyDiv=document.getElementById("history")
+let favoritesDiv=document.getElementById("favorites")
+
+function getFavs(){
+return JSON.parse(localStorage.getItem("oshoFav")) || []
+}
+
+function setFavs(favs){
+localStorage.setItem("oshoFav", JSON.stringify(favs))
+}
+
+function renderFavs(){
+let favs=getFavs()
+
+if(favs.length===0){
+favoritesDiv.innerHTML=`<div class="fav-empty">No favorites yet.</div>`
+return
+}
+
+favoritesDiv.innerHTML=""
+
+favs.slice().reverse().forEach((text, index)=>{
+let originalIndex=favs.length-1-index
+let item=document.createElement("div")
+item.className="fav-item"
+
+item.innerHTML=`
+<div class="fav-text"></div>
+<button class="fav-remove" onclick="removeFav(${originalIndex})" title="Remove">✖</button>`
+
+item.querySelector(".fav-text").innerText=text
+favoritesDiv.appendChild(item)
+})
+}
+
+function removeFav(index){
+let favs=getFavs()
+favs.splice(index,1)
+setFavs(favs)
+renderFavs()
+}
+
+function extractMessageText(el){
+let node=el.parentElement.cloneNode(true)
+node.querySelectorAll(".copy").forEach(btn=>btn.remove())
+return node.innerText.trim()
+}
 
 function addHistory(text){
 
@@ -527,29 +617,24 @@ document.getElementById("quoteBox").innerText="🧘 "+data.quote
 
 function saveFav(el){
 
-let text = el.parentElement.innerText
+let text = extractMessageText(el)
+
+if(text==="") return
 
 let favs = JSON.parse(localStorage.getItem("oshoFav")) || []
 
-favs.push(text)
-
-localStorage.setItem("oshoFav", JSON.stringify(favs))
-
-el.innerText="✅"
-
+if(favs.includes(text)){
+el.innerText="⭐"
+return
 }
 
-function saveFav(el){
-
-let text = el.parentElement.innerText
-
-let favs = JSON.parse(localStorage.getItem("oshoFav")) || []
-
 favs.push(text)
 
 localStorage.setItem("oshoFav", JSON.stringify(favs))
 
 el.innerText="✅"
+
+renderFavs()
 
 }
 
@@ -583,6 +668,8 @@ sound.play()
 },1000)
 
 }
+
+renderFavs()
 </script>
 
 </body>
