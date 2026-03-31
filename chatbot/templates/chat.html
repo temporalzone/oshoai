@@ -239,6 +239,15 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 z-index:999;
+animation:splashFadeOut .6s ease 2.4s forwards;
+}
+
+@keyframes splashFadeOut{
+to{
+opacity:0;
+visibility:hidden;
+pointer-events:none;
+}
 }
 
 #splash img{
@@ -673,6 +682,9 @@ fetch("/quote/")
 .then(res=>res.json())
 .then(data=>{
 document.getElementById("quoteBox").innerText="🧘 "+data.quote
+})
+.catch(()=>{
+document.getElementById("quoteBox").innerText="🧘 Stay present. Breathe and begin."
 })
 
 function saveFav(el){
