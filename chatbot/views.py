@@ -14,6 +14,10 @@ def chat(request):
     return render(request, "chat.html")
 
 
+def healthz(request):
+    return JsonResponse({"status": "ok"})
+
+
 def get_response(request):
     try:
         message = request.GET.get("message")
