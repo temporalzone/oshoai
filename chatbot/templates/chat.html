@@ -224,6 +224,11 @@ opacity:.7;
 .copy:hover{
 opacity:1;
 }
+
+.audio-control{
+display:inline-block;
+margin-left:10px;
+}
 #splash{
 position:fixed;
 width:100%;
@@ -376,6 +381,8 @@ Osho AI Chatbot
 
 let historyDiv=document.getElementById("history")
 let favoritesDiv=document.getElementById("favorites")
+let activeSpeech=null
+let activeSpeechButton=null
 
 function getFavs(){
 return JSON.parse(localStorage.getItem("oshoFav")) || []
@@ -479,11 +486,10 @@ fetch(`/get/?message=${encodeURIComponent(message)}&lang=${lang}`)
 document.querySelector(".typing").parentElement.innerHTML=
 marked.parse(data.response)+
 `<span class="copy" onclick="copyText(this)">📋</span>
-<span class="copy" onclick="saveFav(this)">⭐</span>`
+<span class="copy" onclick="saveFav(this)">⭐</span>
+<span class="copy audio-control" onclick="toggleSpeech(this)">▶ Play</span>`
 
 chatbox.scrollTop=chatbox.scrollHeight
-
-speak(data.response)
 
 })
 
@@ -508,8 +514,19 @@ if(e.key==="Enter") sendMessage()
 
 })
 
-function speak(text){
+function stopActiveSpeech(){
+if(activeSpeech){
+window.speechSynthesis.cancel()
+activeSpeech=null
+}
 
+if(activeSpeechButton){
+activeSpeechButton.innerText="▶ Play"
+activeSpeechButton=null
+}
+}
+
+function createSpeech(text){
 let speech = new SpeechSynthesisUtterance(text)
 
 let selectedLang = document.getElementById("language").value
@@ -535,12 +552,43 @@ v.name.toLowerCase().includes("daniel")
 }
 
 speech.voice = voice || voices[0]
-
 speech.rate = 0.85
 speech.pitch = 0.8
 
-window.speechSynthesis.speak(speech)
+return speech
+}
 
+function toggleSpeech(el){
+if(activeSpeechButton===el && window.speechSynthesis.speaking){
+if(window.speechSynthesis.paused){
+window.speechSynthesis.resume()
+el.innerText="⏸ Pause"
+}else{
+window.speechSynthesis.pause()
+el.innerText="▶ Play"
+}
+return
+}
+
+stopActiveSpeech()
+
+let text = extractMessageText(el)
+if(text==="") return
+
+let speech = createSpeech(text)
+activeSpeech=speech
+activeSpeechButton=el
+el.innerText="⏸ Pause"
+
+speech.onend=function(){
+stopActiveSpeech()
+}
+
+speech.onerror=function(){
+stopActiveSpeech()
+}
+
+window.speechSynthesis.speak(speech)
 }
 
 function startVoice(){
