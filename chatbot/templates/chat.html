@@ -509,7 +509,7 @@ Osho AI Chatbot
 
 <input id="message" placeholder="Ask about life...">
 
-<button onclick="startVoice()">🎤</button>
+<button id="voiceBtn" onclick="startVoice()">🎤</button>
 
 <button onclick="sendMessage()">Send</button>
 
@@ -716,7 +716,7 @@ return speech
 }
 
 function toggleSpeech(el){
-if(activeSpeechButton===el && window.speechSynthesis.speaking){
+if(activeSpeechButton===el && (window.speechSynthesis.speaking || window.speechSynthesis.paused)){
 if(window.speechSynthesis.paused){
 window.speechSynthesis.resume()
 el.innerText="⏸ Pause"
@@ -750,9 +750,25 @@ window.speechSynthesis.speak(speech)
 
 function startVoice(){
 
-const recognition=new webkitSpeechRecognition()
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+if(!SpeechRecognition){
+alert("Voice input is not supported in this browser. Please use Chrome on HTTPS.")
+return
+}
+
+const voiceBtn=document.getElementById("voiceBtn")
+voiceBtn.innerText="🎙..."
+
+const recognition=new SpeechRecognition()
 
 recognition.lang="en-US"
+recognition.interimResults=false
+recognition.maxAlternatives=1
+
+recognition.onstart=function(){
+voiceBtn.innerText="🎙..."
+}
 
 recognition.onresult=function(event){
 
@@ -760,8 +776,27 @@ let voiceText=event.results[0][0].transcript
 
 document.getElementById("message").value=voiceText
 
+voiceBtn.innerText="🎤"
+
 sendMessage()
 
+}
+
+recognition.onerror=function(event){
+voiceBtn.innerText="🎤"
+if(event.error==="not-allowed"){
+alert("Microphone permission denied. Please allow microphone access in browser settings.")
+return
+}
+if(event.error==="no-speech"){
+alert("No speech detected. Please speak clearly and try again.")
+return
+}
+alert("Voice input failed: "+event.error)
+}
+
+recognition.onend=function(){
+voiceBtn.innerText="🎤"
 }
 
 recognition.start()
@@ -879,14 +914,61 @@ clearInterval(timer)
 document.getElementById("timerText").innerText =
 "✨ Meditation Complete"
 
-let sound=document.getElementById("meditationSound")
-sound.currentTime=0
-sound.play()
+playMeditationCompletionAlert()
 
 }
 
 },1000)
 
+}
+
+function playMeditationCompletionAlert(){
+let sound=document.getElementById("meditationSound")
+
+if(sound){
+sound.pause()
+sound.currentTime=0
+sound.loop=false
+
+let playPromise=sound.play()
+if(playPromise && typeof playPromise.catch === "function"){
+playPromise.catch(()=>{
+playBeepFallback()
+})
+}
+
+setTimeout(()=>{
+sound.pause()
+sound.currentTime=0
+sound.loop=true
+},4000)
+
+return
+}
+
+playBeepFallback()
+}
+
+function playBeepFallback(){
+let AudioContextClass = window.AudioContext || window.webkitAudioContext
+if(!AudioContextClass) return
+
+let ctx = new AudioContextClass()
+let beepTimes=[0,0.35,0.7]
+
+beepTimes.forEach((offset)=>{
+let osc=ctx.createOscillator()
+let gain=ctx.createGain()
+osc.type="sine"
+osc.frequency.value=880
+gain.gain.setValueAtTime(0.0001, ctx.currentTime + offset)
+gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + offset + 0.02)
+gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + offset + 0.22)
+osc.connect(gain)
+gain.connect(ctx.destination)
+osc.start(ctx.currentTime + offset)
+osc.stop(ctx.currentTime + offset + 0.24)
+})
 }
 
 renderFavs()
